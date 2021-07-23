@@ -157,9 +157,9 @@ public class ResourceCentreTest {
 				assertEquals("Test if cc2 is now available", Camcorder, testOutput2);
 				
 				//Test that isAvailable is false
-				assertEquals("Test if cc2 isAvailable is now true",camcorderList.get(0).getIsAvailable(),cc2.getIsAvailable());
-		
+				assertEquals("Test if cc2 isAvailable is now true",camcorderList.get(0).getIsAvailable(),cc2.getIsAvailable());	
 	}
+	
 	@Test
 	public void testDoReturnChromebook() {
 		// write your code here
