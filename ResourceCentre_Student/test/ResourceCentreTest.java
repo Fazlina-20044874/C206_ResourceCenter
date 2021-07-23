@@ -11,6 +11,7 @@ public class ResourceCentreTest {
 	private Camcorder cc2;
 	private Chromebook cb1;
 	private Chromebook cb2;
+	private Chromebook cb3;
 	
 	private ArrayList<Camcorder> camcorderList;
 	private ArrayList<Chromebook> chromebookList;
@@ -26,6 +27,9 @@ public class ResourceCentreTest {
 		cc2 = new Camcorder("CC0012", "Sony DSC-RX100M7", 20);
 		cb1 = new Chromebook("CB0011", "My Google Chromebook 1st", "Mac OS");
 		cb2 = new Chromebook("CB0012", "SAMSUNG Chromebook 4+", "Win 10");
+		cb3 = new Chromebook("CB0013", "Macbook Pro", "Mac OS");
+		cb3.setIsAvailable(true);
+
 
 		camcorderList= new ArrayList<Camcorder>();
 		chromebookList= new ArrayList<Chromebook>();
@@ -47,11 +51,24 @@ public class ResourceCentreTest {
 		//Add another item. test The size of the list is 2?
 		ResourceCentre.addCamcorder(camcorderList, cc2);
 		assertEquals("Test that Camcorder arraylist size is 2?", 2, camcorderList.size());
+		
+		
 	}
 	@Test
 	public void testAddChromebook() {
 		//fail("Not yet implemented");
 		// write your code here
+		assertNotNull("Test if there is valid Chromebook arraylist to add to", chromebookList);
+		
+		ResourceCentre.addChromebook(chromebookList, cb1);	
+		assertEquals("Test if that Chromebook arraylist size is 1?", 1, chromebookList.size());
+		
+		assertSame("Test that Chromebook is added same as 1st item of the list?", cb1, chromebookList.get(0));
+		
+		ResourceCentre.addChromebook(chromebookList, cb2);
+		assertEquals("Test that Chromebook arraylist size is 2?", 2, chromebookList.size());
+		
+		assertSame("Test that Chromebook is added same as 2nd item of the list?", cb2, chromebookList.get(1));
 	}
 	
 	@Test
@@ -82,7 +99,29 @@ public class ResourceCentreTest {
 	public void testRetrieveAllChromebook() {
 		//fail("Not yet implemented");
 		// write your code here
+		// Test if chrombookList is empty
+			assertNotNull("Test if there is valid Chrombook arraylist to add to", chromebookList);
+				
+		//test if the list of chromebook retrieved from the SourceCentre is empty
+			String allChromebook= ResourceCentre.retrieveAllChromebook(chromebookList);
+			String testOutput = "";
+			assertEquals("Check that ViewAllChromebooklist", testOutput, allChromebook);
+						
+		//Given an empty list, after adding 2 items, test if the size of the list is 2
+			ResourceCentre.addChromebook(chromebookList, cb1);
+			ResourceCentre.addChromebook(chromebookList, cb2);
+			assertEquals("Test if that Chromebook arraylist size is 2?", 2, chromebookList.size());
+				
+		//test if the expected output string same as the list of chromebook retrieved from the SourceCentre
+			allChromebook= ResourceCentre.retrieveAllChromebook(chromebookList);
+
+			testOutput = String.format("%-10s %-30s %-10s %-10s %-20s\n","CB0011", "My Google Chromebook 1st", "Yes", "", "Mac OS");
+			testOutput += String.format("%-10s %-30s %-10s %-10s %-20s\n","CB0012", "SAMSUNG Chromebook 4+","Yes","", "Win 10");
+			
+			assertEquals("Check that ViewAllChromebooklist", testOutput, allChromebook);
+			
 	}
+
 
 	@Test
 	public void testDoLoanCamcorder() {
@@ -99,22 +138,60 @@ public class ResourceCentreTest {
 	
 	@Test
 	public void testDoReturnCamcorder() {
-		//fail("Not yet implemented");
 		// write your code here
+		//Test that a given list is not null, a newly added item cannot be returned successfully
+				assertNotNull(camcorderList);
+				assertFalse(ResourceCentre.doReturnCamcorder(camcorderList,cc2.getAssetTag()));
+				
+				//Test that camcorder which is loaned already is not available and has a due date before able to return
+				ResourceCentre.addCamcorder(camcorderList, cc2);
+				ResourceCentre.doLoanCamcorder(camcorderList, "CC0012", "24/8/2021");
+				String Camcorder2= ResourceCentre.retrieveAllCamcorder(camcorderList);
+				String testOutput = String.format("%-10s %-30s %-10s %-10s %-20s\n","CC0012", "Sony DSC-RX100M7", "No", "24/8/2021", 20);
+				assertEquals("Test if cc2 is loaned",Camcorder2,testOutput);
+				
+				//Test that after camcorder returned, Avalaible becomes "Yes" and has no due date.
+				ResourceCentre.doReturnCamcorder(camcorderList,"CC0012");
+				String Camcorder= ResourceCentre.retrieveAllCamcorder(camcorderList);
+				String testOutput2 = String.format("%-10s %-30s %-10s %-10s %-20s\n","CC0012", "Sony DSC-RX100M7", "Yes", "", 20);
+				assertEquals("Test if cc2 is now available", Camcorder, testOutput2);
+				
+				//Test that isAvailable is false
+				assertEquals("Test if cc2 isAvailable is now true",camcorderList.get(0).getIsAvailable(),cc2.getIsAvailable());
 		
 	}
 	@Test
 	public void testDoReturnChromebook() {
-		//fail("Not yet implemented");
 		// write your code here
+		//Test that a given list is not null, a newly added item cannot be returned successfully
+		assertNotNull(chromebookList);
+		assertFalse(ResourceCentre.doReturnChromebook(chromebookList,cb1.getAssetTag()));
+		
+		//Test that chromebook which is loaned already is not available and has a due date before able to return
+		
+		ResourceCentre.addChromebook(chromebookList, cb3);
+		ResourceCentre.doLoanChromebook(chromebookList, "CB0013", "24/8/2021");
+		String Chromebook3= ResourceCentre.retrieveAllChromebook(chromebookList);
+		String testOutput = String.format("%-10s %-30s %-10s %-10s %-20s\n","CB0013", "Macbook Pro", "No", "24/8/2021", "Mac OS");
+		assertEquals("Test if cb3 is loaned",Chromebook3,testOutput);
+		
+		//Test that after chromebook returned, Avalaible becomes "Yes" and has no due date.
+		ResourceCentre.doReturnChromebook(chromebookList,"CB0013");
+		String Chromebook= ResourceCentre.retrieveAllChromebook(chromebookList);
+		String testOutput2 = String.format("%-10s %-30s %-10s %-10s %-20s\n","CB0013", "Macbook Pro", "Yes", "", "Mac OS");
+		assertEquals("Test if cb3 is now available", Chromebook, testOutput2);
+		
+		//Test that isAvailable is false
+		assertEquals("Test if cb3 isAvailable is now true",chromebookList.get(0).getIsAvailable(),cb3.getIsAvailable());
 	}
-	
+
 	@After
 	public void tearDown() throws Exception {
 		cc1 = null;
 		cc2 = null;
 		cb1 = null;
 		cb2 = null;
+		cb3 = null;
 		camcorderList = null;
 		chromebookList = null;
 
